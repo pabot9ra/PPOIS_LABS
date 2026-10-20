@@ -143,3 +143,21 @@ std::ostream &operator<<(std::ostream &os, const PostMachine &machine){
     return os;
 
 }
+
+int PostMachine::run(int limit){
+    int counter = 0;
+    for(;counter < limit && step();counter++){
+    } 
+    return counter;
+}
+
+PostMachine& PostMachine::operator++(){
+    step();
+    return *this;
+}
+
+PostMachine PostMachine::operator++(int){
+    PostMachine tmp = *this;
+    step();
+    return tmp;
+}
