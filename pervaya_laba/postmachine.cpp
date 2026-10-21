@@ -1,6 +1,7 @@
 #include "postmachine.h"
 #include <istream>
 #include <ostream>
+#include <string>
 
 PostMachine::PostMachine()
     : tape_(),  program_(), pos_(0), current_(1), state_(State::Running) {
@@ -160,4 +161,38 @@ PostMachine PostMachine::operator++(int){
     PostMachine tmp = *this;
     step();
     return tmp;
+}
+
+std::istream& operator>>(std::istream &is, PostMachine &machine){
+    std::string tapestring;
+    Tape tmptape;
+    is >> tapestring;
+    if(tapestring != "tape:"){
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+    is >> tmptape;
+    if(!is){return is;}
+    std::string carrstring;
+    is >> carrstring;
+    if(carrstring != "carriage:"){
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+    long long tmpcarrpos;
+    is >> tmpcarrpos;
+    if (!is){
+        return is;
+    }
+    Program tmp_program;
+    is >> tmp_program;
+    if (!is){
+        return is;
+    }
+
+    machine.setTape(tmptape);
+    machine.setProgram(tmp_program);
+    machine.setPosition(tmpcarrpos);
+    machine.reset();
+    return is;
 }

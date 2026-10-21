@@ -1,6 +1,7 @@
 #include "tape.h"
 #include <ostream>
 #include <istream>
+#include <string>
 
 Tape::Tape() {
 }
@@ -47,7 +48,7 @@ bool Tape::operator==(const Tape &other) const {
 }
 
 bool Tape::operator!=(const Tape &other) const {
-    return (*this == other);
+    return (!(*this == other));
 }
 
 std::ostream& operator<<(std::ostream &os, const Tape &tape) {
@@ -68,4 +69,26 @@ std::ostream& operator<<(std::ostream &os, const Tape &tape) {
         }
     }
     return os;
+}
+
+std::istream& operator>>(std::istream &is, Tape &tape){
+    long long start;
+    std::string s;
+    is >> start >> s;
+    if (!is){
+        return is;
+    } 
+    tape.clear();
+    size_t i = 0;
+    for (; i < s.size(); i++){
+        if (s[i] == 'V'){
+            tape.mark(start + static_cast<long long>(i));
+        } else if (s[i] == '.'){
+            tape.unmark(start + static_cast<long long>(i));
+        } else {
+            is.setstate(std::ios::failbit);
+            return is;
+        }
+    }
+    return is;
 }
