@@ -2,9 +2,14 @@
 #include <fstream>
 #include "postmachine.h"
 #include <string>
+#include "menu.h"
 const int STEP_LIMIT = 10000;
 
 int main(int argc, char *argv[]) {
+    if(argc == 1){
+        runMenu();
+        return 0;
+    }
     if (argc < 2){
         std::cerr << "Usage: ./prog example.txt [-log]" << '\n';
         return 1;
