@@ -4,6 +4,8 @@
 #include "program.h"
 #include "postmachine.h"
 #include <sstream>
+
+// tape tests
 TEST(TapeIsEmpty){
     Tape tape;
     CHECK_EQUAL(true, tape.empty());
@@ -23,20 +25,19 @@ TEST(MarkTwiceCount){
 }
 
 TEST(UnmarkUnmarking){
-    std::istringstream input("0 V");
-    Tape tmptape;
-    input >> tmptape;
     Tape tape;
     tape.mark(0);
     tape.mark(1);
     tape.unmark(1);
-    CHECK_EQUAL(tmptape, tape);
+    CHECK_EQUAL(false, tape.isMarked(1));
+    CHECK_EQUAL(true, tape.isMarked(0));
+    CHECK_EQUAL(1, tape.count());
 }
 
 TEST(NegativePos){
     Tape tape;
     tape.mark(-1);
-    CHECK_EQUAL(1, tape.count());
+    CHECK_EQUAL(true, tape.isMarked(-1));
 }
 
 TEST(minmaxPos){
@@ -78,6 +79,42 @@ TEST(NotMarkedBetween){
     CHECK_EQUAL(true, tape.isMarked(-1));
     CHECK_EQUAL(false, tape.isMarked(0));
     CHECK_EQUAL(true, tape.isMarked(1));
+}
+// instruction tests
+TEST(InsTypeAndNext1){
+    Instruction ins(OpType::Mark, 1);
+    CHECK(ins.type() == OpType::Mark);
+    CHECK_EQUAL(1, ins.next1());
+}
+
+TEST(InsBranchConstructor){
+    Instruction ins(OpType::Branch, 3, 5);
+    CHECK(OpType::Branch == ins.type());
+    CHECK_EQUAL(3, ins.next1());
+    CHECK_EQUAL(5, ins.next2());
+}
+TEST(InsDefaultConstructor){
+    Instruction ins;
+    CHECK(OpType::Stop == ins.type());
+    CHECK_EQUAL(0, ins.next1());
+    CHECK_EQUAL(0, ins.next2());
+}
+
+TEST(InsStream){
+    std::istringstream input("? 3, 1");
+    Instruction ins;
+    input >> ins;
+    CHECK(OpType::Branch == ins.type());
+    CHECK_EQUAL(3, ins.next1());
+    CHECK_EQUAL(1, ins.next2());
+    CHECK_EQUAL(false, !input);
+}
+
+TEST(InsStreamError){
+    std::istringstream input("L 5");
+    Instruction ins;
+    input >> ins;
+    CHECK_EQUAL(true, !input);
 }
 int main(){
     return UnitTest::RunAllTests();
