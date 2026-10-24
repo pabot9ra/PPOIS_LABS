@@ -3,5 +3,5 @@
 prog
 *.dSYM/
 .vscode/
-tests/
+tests
 html/
