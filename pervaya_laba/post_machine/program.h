@@ -1,3 +1,7 @@
+/// @file program.h
+/// @author Владислав Вертинский
+/// @brief Программа машины Поста
+
 #ifndef PROGRAM_H
 #define PROGRAM_H
 
@@ -5,31 +9,75 @@
 #include <iosfwd>
 #include "instruction.h"
 
+/// @brief Программа машины Поста - упорядоченный список команд
+/// @details Команды нумеруются с единицы, как в записи программы машины Поста; внутри хранятся в векторе с нуля, пересчёт номера в индекс только в at().
+/// Программа не проверяет, что номера переходов ведут на существующие команды - это обнаруживает PostMachine::step() при выполнении
 class Program {
 private:
     std::vector<Instruction> instructions_;
 
 public:
-     Program();
+    /// @brief создание пустой программы(0 команд)
+    Program();
 
-     int size() const;
-     bool empty() const;
-     void add(const Instruction &ins);
-     bool remove(int n);
-     bool has(int n) const;
-     const Instruction& at(int n) const;
-     void clear();
-     
-    
+    /// @brief возвращает количество команд в программе
+    /// @return число команд
+    int size() const;
 
+    /// @brief проверяет что в программе нет команд
+    /// @return true если программа пустая
+    bool empty() const;
 
-    
+    /// @brief добавляет команду в конец программы
+    /// @details новая команда получает номер size() после добавления
+    /// @param ins команда для добавления
+    void add(const Instruction &ins);
 
+    /// @brief удаляет команду по номеру
+    /// @details команды после удалённой сдвигаются на один номер вниз, номера переходов в остальных командах не пересчитываются
+    /// @param n номер команды (с 1)
+    /// @return true если команда удалена, false если команды с таким номером нет
+    bool remove(int n);
+
+    /// @brief проверяет, есть ли команда с таким номером
+    /// @param n номер команды (с 1)
+    /// @return true если 1 <= n <= size()
+    bool has(int n) const;
+
+    /// @brief возвращает команду по номеру
+    /// @details при несуществующем номере бросает std::out_of_range - перед вызовом проверяйте has()
+    /// @param n номер команды (с 1)
+    /// @return ссылка на команду, изменить через неё нельзя
+    const Instruction& at(int n) const;
+
+    /// @brief удаляет все команды из программы
+    void clear();
+
+    /// @brief позволяет проверить на равность две программы
+    /// @details программы равны, если у них одинаковое число команд и команды с одинаковыми номерами равны
+    /// @param other программа для сравнения
+    /// @return true если программы равны, false когда неравны
     bool operator==(const Program &other) const;
+
+    /// @brief позволяет проверить на неравность две программы
+    /// @param other программа для сравнения
+    /// @return true если программы неравны, false когда равны
     bool operator!=(const Program &other) const;
 };
 
+/// @brief позволяет выводить программу в поток
+/// @details каждая команда на отдельной строке в формате Instruction
+/// @param os поток вывода
+/// @param prog программа
+/// @return возвращает поток вывода
 std::ostream& operator<<(std::ostream &os, const Program &prog);
+
+/// @brief позволяет читать программу из потока
+/// @details содержимое программы полностью заменяется, а не дописывается. Команды читаются до конца потока; конец потока ошибкой не считается.
+/// При неверной команде чтение останавливается, поток переводится в состояние ошибки, а в программе остаются команды, прочитанные до неё
+/// @param is поток ввода
+/// @param prog программа, в которую записывается результат
+/// @return возвращает поток ввода
 std::istream& operator>>(std::istream &is, Program &prog);
 
 #endif
