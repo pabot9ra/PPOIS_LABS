@@ -20,9 +20,9 @@ class Cube{
         const Face& face(FaceId id) const;
         bool isSolved() const;
         void moveU();
-        
-
-        
+        void moveR();
+        void moveL();
+        void moveD();
 };
 
 #endif
