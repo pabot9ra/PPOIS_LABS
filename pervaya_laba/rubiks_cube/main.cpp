@@ -65,4 +65,73 @@ for(int i = 0; i < 4;i++){
 }
 std::cout << "after 4L solved: " << Ltest4rot.isSolved() << '\n'; // 1
 
+
+
+Cube RDtest;
+RDtest.moveR();
+RDtest.moveD();
+
+std::cout << "R[2][0] green: "  << (RDtest.face(FaceId::R).at(2, 0) == Color::Green) << '\n';    // 1
+std::cout << "R[2][2] yellow: "  << (RDtest.face(FaceId::R).at(2, 2) == Color::Yellow) << '\n';  // 1
+std::cout << "B[2][0] red: "  << (RDtest.face(FaceId::B).at(2, 0) == Color::Red) << '\n';        // 1
+std::cout << "L[2][0] white: "  << (RDtest.face(FaceId::L).at(2, 0) == Color::White) << '\n';    // 1
+std::cout << "L[2][2] blue: "  << (RDtest.face(FaceId::L).at(2, 2) == Color::Blue) << '\n';      // 1
+std::cout << "F[2][0] orange: "  << (RDtest.face(FaceId::F).at(2, 0) == Color::Orange) << '\n';  // 1
+std::cout << "D[2][2] blue: "  << (RDtest.face(FaceId::D).at(2, 2) == Color::Blue) << '\n';     // 1
+
+Cube Dtest4rot;
+
+for(int i = 0; i < 4;i++){
+    Dtest4rot.moveD();
+}
+
+std::cout << "after 4D solved: " << Dtest4rot.isSolved() << '\n'; // 1
+
+
+
+Cube UFtest;
+UFtest.moveU();
+UFtest.moveF();
+
+std::cout << "U[2][0] orange: "  << (UFtest.face(FaceId::U).at(2, 0) == Color::Orange) << '\n';    // 1
+std::cout << "U[2][2] green: "  << (UFtest.face(FaceId::U).at(2, 2) == Color::Green) << '\n';  // 1
+std::cout << "R[0][0] white: "  << (UFtest.face(FaceId::R).at(0, 0) == Color::White) << '\n';        // 1
+std::cout << "D[0][0] red: "  << (UFtest.face(FaceId::D).at(0, 0) == Color::Red) << '\n';    // 1
+std::cout << "D[0][2] blue: "  << (UFtest.face(FaceId::D).at(0, 2) == Color::Blue) << '\n';      // 1
+std::cout << "L[0][2] yellow: "  << (UFtest.face(FaceId::L).at(0, 2) == Color::Yellow) << '\n';      // 1
+std::cout << "F[0][0] green: "  << (UFtest.face(FaceId::F).at(0, 0) == Color::Green) << '\n';  // 1
+std::cout << "F[0][2] red: "  << (UFtest.face(FaceId::F).at(0, 2) == Color::Red) << '\n';     // 1
+
+Cube Ftest4rot;
+
+for(int i = 0; i < 4;i++){
+    Ftest4rot.moveF();
+}
+
+std::cout << "after 4F solved: " << Ftest4rot.isSolved() << '\n'; // 1
+
+
+
+Cube UBtest;
+UBtest.moveU();
+UBtest.moveB();
+
+std::cout << "U[0][0] blue: "  << (UBtest.face(FaceId::U).at(0, 0) == Color::Blue) << '\n';     // 1
+std::cout << "U[0][2] red: "  << (UBtest.face(FaceId::U).at(0, 2) == Color::Red) << '\n';       // 1
+std::cout << "R[0][2] yellow: "  << (UBtest.face(FaceId::R).at(0, 2) == Color::Yellow) << '\n'; // 1
+std::cout << "D[2][0] green: "  << (UBtest.face(FaceId::D).at(2, 0) == Color::Green) << '\n';       // 1
+std::cout << "D[2][2] orange: "  << (UBtest.face(FaceId::D).at(2, 2) == Color::Orange) << '\n';     // 1
+std::cout << "L[0][0] white: "  << (UBtest.face(FaceId::L).at(0, 0) == Color::White) << '\n';        // 1
+std::cout << "B[0][0] blue: "  << (UBtest.face(FaceId::B).at(0, 0) == Color::Blue) << '\n';     // 1
+std::cout << "B[0][2] orange: "  << (UBtest.face(FaceId::B).at(0, 2) == Color::Orange) << '\n';        // 1
+
+
+Cube Btest4rot;
+
+for(int i = 0; i < 4; i++){
+    Btest4rot.moveB();
+}
+
+std::cout << "after 4B solved: " << Btest4rot.isSolved() << '\n'; // 1
+
 }

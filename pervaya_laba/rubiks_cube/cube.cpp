@@ -57,3 +57,37 @@ void Cube::moveL(){
 }       
 }
 
+void Cube::moveD(){
+    Cube old = *this;
+    faces_[static_cast<int>(FaceId::D)].rotateClockwise();
+    for(int i = 0; i < 3;i++){
+        faces_[static_cast<int>(FaceId::R)].set(2, i, old.faces_[static_cast<int>(FaceId::F)].at(2, i));
+        faces_[static_cast<int>(FaceId::L)].set(2, i, old.faces_[static_cast<int>(FaceId::B)].at(2, i));
+        faces_[static_cast<int>(FaceId::B)].set(2, i, old.faces_[static_cast<int>(FaceId::R)].at(2, i));
+        faces_[static_cast<int>(FaceId::F)].set(2, i, old.faces_[static_cast<int>(FaceId::L)].at(2, i));
+
+    }
+}
+
+void Cube::moveF(){
+    Cube old = *this;
+    faces_[static_cast<int>(FaceId::F)].rotateClockwise();
+    for(int i = 0; i<3;i++){
+        faces_[static_cast<int>(FaceId::L)].set(i, 2, old.faces_[static_cast<int>(FaceId::D)].at(0, i));
+        faces_[static_cast<int>(FaceId::U)].set(2, i, old.faces_[static_cast<int>(FaceId::L)].at(2-i, 2));
+        faces_[static_cast<int>(FaceId::R)].set(i, 0, old.faces_[static_cast<int>(FaceId::U)].at(2, i));
+        faces_[static_cast<int>(FaceId::D)].set(0, i, old.faces_[static_cast<int>(FaceId::R)].at(2-i, 0));
+
+    }
+}
+
+void Cube::moveB(){
+    Cube old = *this;
+    faces_[static_cast<int>(FaceId::B)].rotateClockwise();
+    for(int i = 0; i<3; i++){
+        faces_[static_cast<int>(FaceId::L)].set(i, 0, old.faces_[static_cast<int>(FaceId::U)].at(0, 2-i));
+        faces_[static_cast<int>(FaceId::D)].set(2, i, old.faces_[static_cast<int>(FaceId::L)].at(i, 0));
+        faces_[static_cast<int>(FaceId::R)].set(i, 2, old.faces_[static_cast<int>(FaceId::D)].at(2, 2-i));
+        faces_[static_cast<int>(FaceId::U)].set(0, i, old.faces_[static_cast<int>(FaceId::R)].at(i, 2));
+    }
+}

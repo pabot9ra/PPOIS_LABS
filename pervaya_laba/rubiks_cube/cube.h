@@ -23,6 +23,8 @@ class Cube{
         void moveR();
         void moveL();
         void moveD();
+        void moveF();
+        void moveB();
 };
 
 #endif
