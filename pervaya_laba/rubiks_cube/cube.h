@@ -12,6 +12,12 @@ enum class FaceId{
     D
 };
 
+enum class Turn{
+    Clockwise,
+    CounterClockwise,
+    DoubleMove
+};
+
 class Cube{
     private:
         std::array<Face, 6> faces_;
@@ -25,6 +31,7 @@ class Cube{
         void moveD();
         void moveF();
         void moveB();
+        void move(FaceId face, Turn turn);
 };
 
 #endif

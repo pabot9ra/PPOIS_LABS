@@ -134,4 +134,16 @@ for(int i = 0; i < 4; i++){
 
 std::cout << "after 4B solved: " << Btest4rot.isSolved() << '\n'; // 1
 
+Cube movetest;
+
+for(int i = 0; i < 6; i++){
+    movetest.move(FaceId::R, Turn::Clockwise);
+    movetest.move(FaceId::U, Turn::Clockwise);
+    movetest.move(FaceId::R, Turn::CounterClockwise);
+    movetest.move(FaceId::U, Turn::CounterClockwise);
+}
+
+std::cout << "after 6 * (R U clockwise + R' U') solved: " << movetest.isSolved() << '\n'; // 1
+
+
 }
