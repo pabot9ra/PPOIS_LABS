@@ -146,9 +146,11 @@ for(int i = 0; i < 6; i++){
 std::cout << "after 6 * (R U clockwise + R' U') solved: " << movetest.isSolved() << '\n'; // 1
 
 Cube outputTest;
-outputTest.move(FaceId::R, Turn::Clockwise);
-
+outputTest.mix(25);
 std::cout << outputTest;
+
+std::cout << "after 25 mix() solved: " << outputTest.isSolved() << '\n'; // 0
+
 
 }
 

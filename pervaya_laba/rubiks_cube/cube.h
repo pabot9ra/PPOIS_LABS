@@ -34,6 +34,7 @@ class Cube{
         void moveF();
         void moveB();
         void move(FaceId face, Turn turn);
+        void mix(int count);
 };
 
 std::ostream& operator<<(std::ostream &os, const Cube &cube);

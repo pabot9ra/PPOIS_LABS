@@ -1,5 +1,6 @@
 #include "cube.h"
 #include <ostream>
+#include <random>
 
 Cube::Cube()
     : faces_{
@@ -157,4 +158,22 @@ std::ostream &operator<<(std::ostream &os,const Cube &cube) {
         os << '\n';
     }
     return os;
+}
+
+void Cube::mix(int count){
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> distFace(0, 5);
+    std::uniform_int_distribution<int> distTurn(0, 2);
+    int n; 
+    int m;
+    FaceId randomFace;
+    Turn randomTurn;
+    for(int i = 0; i < count; i++){
+        n = distFace(gen);
+        m = distTurn(gen);
+        randomFace = static_cast<FaceId>(n);
+        randomTurn = static_cast<Turn>(m);
+        move(randomFace, randomTurn);
+    }
 }
