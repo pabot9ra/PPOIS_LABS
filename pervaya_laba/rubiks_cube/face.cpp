@@ -1,5 +1,6 @@
 #include "face.h"
 #include <ostream>
+#include <istream>
 
 Face::Face(Color color){
     for(int r = 0; r < 3; r++){
@@ -71,4 +72,37 @@ std::ostream& operator<<(std::ostream &os, Color color){
             break;
     }
     return os;
+}
+
+std::istream& operator>>(std::istream &is, Color &color){
+    char colorSymbol;
+    is >> colorSymbol;
+    if(!is){
+        return is;
+    }
+    switch(colorSymbol){
+        case 'B':
+            color = Color::Blue;
+            break;
+        case 'R':
+            color = Color::Red;
+            break;
+        case 'Y':
+            color = Color::Yellow;
+            break;
+        case 'G':
+            color = Color::Green;
+            break;
+        case 'W':
+            color = Color::White;
+            break;
+        case 'O':
+            color = Color::Orange;
+            break;
+        default:
+            is.setstate(std::ios::failbit);
+            break;
+
+    }
+    return is;
 }

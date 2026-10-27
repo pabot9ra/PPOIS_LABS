@@ -26,4 +26,6 @@ class Face{
 
 std::ostream& operator<<(std::ostream &os, Color color);
 
+std::istream& operator>>(std::istream &is, Color &color);
+
 #endif

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "face.h"
 #include "cube.h"
+#include <sstream>
 int main() {
     Face f(Color::Red);
     std::cout << "solved: " << f.isSolved() << '\n';      // 1
@@ -151,6 +152,12 @@ std::cout << outputTest;
 
 std::cout << "after 25 mix() solved: " << outputTest.isSolved() << '\n'; // 0
 
+std::istringstream in("G X");
+Color a, b;
+in >> a;
+std::cout << "G read: " << (a == Color::Green) << '\n';  // 1
+in >> b;
+std::cout << "X fails: " << !in << '\n';                 // 1
 
 }
 
