@@ -1,4 +1,5 @@
 #include "cube.h"
+#include <ostream>
 
 Cube::Cube()
     : faces_{
@@ -118,4 +119,42 @@ void Cube::move(FaceId face, Turn turn) {
             break;
         }
     }
+}
+
+std::ostream &operator<<(std::ostream &os,const Cube &cube) {
+
+    for (int i = 0; i < 3; i++) {
+        os << "      ";
+        for (int j = 0; j < 3; j++) {
+
+            os << cube.face(FaceId::U).at(i, j) << ' ';
+        }
+        os << '\n';
+
+    }
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            os << cube.face(FaceId::L).at(i, j) << ' ';
+        }
+        for (int j = 0; j < 3; j++) {
+            os << cube.face(FaceId::F).at(i, j) << ' ';
+        }
+        for (int j = 0; j < 3; j++) {
+            os << cube.face(FaceId::R).at(i, j) << ' ';
+        }
+        for (int j = 0; j < 3; j++) {
+            os << cube.face(FaceId::B).at(i, j) << ' ';
+        }
+        os << '\n';
+    }
+    
+    for (int i = 0; i < 3; i++) {
+        os << "      ";
+        for (int j = 0; j < 3; j++) {
+
+            os << cube.face(FaceId::D).at(i, j) << ' ';
+        }
+        os << '\n';
+    }
+    return os;
 }

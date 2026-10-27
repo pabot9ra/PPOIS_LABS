@@ -2,6 +2,8 @@
 #define CUBE_H
 #include <array>
 #include "face.h"
+#include <iosfwd>
+
 
 enum class FaceId{
     U,
@@ -33,5 +35,7 @@ class Cube{
         void moveB();
         void move(FaceId face, Turn turn);
 };
+
+std::ostream& operator<<(std::ostream &os, const Cube &cube);
 
 #endif

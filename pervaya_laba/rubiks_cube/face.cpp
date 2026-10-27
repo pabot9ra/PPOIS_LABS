@@ -1,4 +1,5 @@
 #include "face.h"
+#include <ostream>
 
 Face::Face(Color color){
     for(int r = 0; r < 3; r++){
@@ -46,4 +47,28 @@ bool Face::operator==(const Face &other) const{
         }
     }
     return true;
+}
+
+std::ostream& operator<<(std::ostream &os, Color color){
+    switch(color){
+        case Color::Blue: 
+            os << 'B';
+            break;
+        case Color::Red: 
+            os << 'R';
+            break;
+        case Color::Yellow: 
+            os << 'Y';
+            break;
+        case Color::Green: 
+            os << 'G';
+            break;
+        case Color::White: 
+            os << 'W';
+            break;
+        case Color::Orange: 
+            os << 'O';
+            break;
+    }
+    return os;
 }

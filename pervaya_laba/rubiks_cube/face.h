@@ -1,6 +1,7 @@
 #ifndef FACE_H
 #define FACE_H
 #include <array>
+#include <iosfwd>
 
 enum class Color{
     Blue,
@@ -22,5 +23,7 @@ class Face{
         bool isSolved() const;
         bool operator==(const Face &other) const;
 };
+
+std::ostream& operator<<(std::ostream &os, Color color);
 
 #endif
