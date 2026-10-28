@@ -1,4 +1,5 @@
 #include "cube.h"
+#include <istream>
 #include <ostream>
 #include <random>
 
@@ -122,7 +123,7 @@ void Cube::move(FaceId face, Turn turn) {
     }
 }
 
-std::ostream &operator<<(std::ostream &os,const Cube &cube) {
+std::ostream &operator<<(std::ostream &os, const Cube &cube) {
 
     for (int i = 0; i < 3; i++) {
         os << "      ";
@@ -131,7 +132,6 @@ std::ostream &operator<<(std::ostream &os,const Cube &cube) {
             os << cube.face(FaceId::U).at(i, j) << ' ';
         }
         os << '\n';
-
     }
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
@@ -148,7 +148,7 @@ std::ostream &operator<<(std::ostream &os,const Cube &cube) {
         }
         os << '\n';
     }
-    
+
     for (int i = 0; i < 3; i++) {
         os << "      ";
         for (int j = 0; j < 3; j++) {
@@ -160,20 +160,95 @@ std::ostream &operator<<(std::ostream &os,const Cube &cube) {
     return os;
 }
 
-void Cube::mix(int count){
+void Cube::mix(int count) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> distFace(0, 5);
     std::uniform_int_distribution<int> distTurn(0, 2);
-    int n; 
+    int n;
     int m;
     FaceId randomFace;
     Turn randomTurn;
-    for(int i = 0; i < count; i++){
+    for (int i = 0; i < count; i++) {
         n = distFace(gen);
         m = distTurn(gen);
         randomFace = static_cast<FaceId>(n);
         randomTurn = static_cast<Turn>(m);
         move(randomFace, randomTurn);
     }
+}
+
+std::istream &operator>>(std::istream &is, Cube &cube) {
+    Cube tmp;
+    Color color;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            is >> color;
+            if (!is)
+                return is;
+            tmp.faces_[static_cast<int>(FaceId::U)].set(i, j, color);
+        }
+    }
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            is >> color;
+            if (!is)
+                return is;
+            tmp.faces_[static_cast<int>(FaceId::L)].set(i, j, color);
+        }
+        for (int j = 0; j < 3; j++) {
+            is >> color;
+            if (!is)
+                return is;
+            tmp.faces_[static_cast<int>(FaceId::F)].set(i, j, color);
+        }
+        for (int j = 0; j < 3; j++) {
+            is >> color;
+            if (!is)
+                return is;
+            tmp.faces_[static_cast<int>(FaceId::R)].set(i, j, color);
+        }
+        for (int j = 0; j < 3; j++) {
+            is >> color;
+            if (!is)
+                return is;
+            tmp.faces_[static_cast<int>(FaceId::B)].set(i, j, color);
+        }
+    }
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            is >> color;
+            if (!is)
+                return is;
+            tmp.faces_[static_cast<int>(FaceId::D)].set(i, j, color);
+        }
+    }
+    std::array<int, 6> counts{};
+    for (int f = 0; f < 6; f++) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                color = tmp.faces_[f].at(i, j);
+                counts[static_cast<int>(color)]++;
+            }
+        }
+    }
+    for (int i = 0; i < 6; i++) {
+        if (counts[i] != 9) {
+            is.setstate(std::ios::failbit);
+            return is;
+        }
+    }
+    std::array<bool, 6> seen{};
+
+    for (int f = 0; f < 6; f++) {
+        color = tmp.faces_[f].at(1, 1);
+        if(!seen[static_cast<int>(color)]){
+            seen[static_cast<int>(color)] = true;
+        } else {
+            is.setstate(std::ios::failbit);
+            return is;
+        }
+    }
+    cube = tmp;
+    return is;
 }

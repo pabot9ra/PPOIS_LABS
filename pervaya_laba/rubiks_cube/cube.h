@@ -35,8 +35,11 @@ class Cube{
         void moveB();
         void move(FaceId face, Turn turn);
         void mix(int count);
+        friend std::istream& operator>>(std::istream &is, Cube &cube);
 };
 
 std::ostream& operator<<(std::ostream &os, const Cube &cube);
+
+std::istream& operator>>(std::istream &is, Cube &cube);
 
 #endif
