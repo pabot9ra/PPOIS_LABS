@@ -19,7 +19,7 @@ void Face::set(int r, int c, Color color){
 }
 
 void Face::rotateClockwise(){
-    std::array old = cells_;
+    auto old = cells_;
     for(int r = 0; r < 3; r++){
         for(int c = 0; c < 3; c++){
             cells_[c][2-r] = old[r][c];
