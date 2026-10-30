@@ -22,6 +22,7 @@ class Face{
         void rotateClockwise();
         bool isSolved() const;
         bool operator==(const Face &other) const;
+        bool operator!=(const Face &other) const;
 };
 
 std::ostream& operator<<(std::ostream &os, Color color);

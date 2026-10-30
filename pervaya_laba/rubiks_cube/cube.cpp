@@ -252,3 +252,17 @@ std::istream &operator>>(std::istream &is, Cube &cube) {
     cube = tmp;
     return is;
 }
+
+bool Cube::operator==(const Cube &other) const{
+    for(int i = 0; i < 6; i++){
+        if (faces_[i] != other.faces_[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Cube::operator!=(const Cube &other) const{
+    return !((*this) == other);
+}

@@ -50,6 +50,10 @@ bool Face::operator==(const Face &other) const{
     return true;
 }
 
+bool Face::operator!=(const Face&other) const{
+    return !((*this) == other);
+}
+
 std::ostream& operator<<(std::ostream &os, Color color){
     switch(color){
         case Color::Blue: 
