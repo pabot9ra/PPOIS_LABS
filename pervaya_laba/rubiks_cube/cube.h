@@ -23,16 +23,17 @@ enum class Turn{
 class Cube{
     private:
         std::array<Face, 6> faces_;
-    public:
-        Cube();
-        const Face& face(FaceId id) const;
-        bool isSolved() const;
         void moveU();
         void moveR();
         void moveL();
         void moveD();
         void moveF();
         void moveB();
+    public:
+        Cube();
+        const Face& face(FaceId id) const;
+        bool isSolved() const;
+        
         void move(FaceId face, Turn turn);
         void mix(int count);
         friend std::istream& operator>>(std::istream &is, Cube &cube);
