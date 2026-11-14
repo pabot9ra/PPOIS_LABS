@@ -5,6 +5,7 @@
 #include "postmachine.h"
 #include <sstream>
 #include <string>
+#include <stdexcept>
 
 // tape tests
 TEST(TapeIsEmpty){
@@ -293,6 +294,389 @@ TEST(MachineIncrementOperators){
 }
 
 
+
+
+
+TEST(TapeEmptyBoundsAndClear){
+    Tape tape;
+    CHECK_EQUAL(0, tape.minPos());
+    CHECK_EQUAL(0, tape.maxPos());
+    tape.mark(-3);
+    tape.mark(5);
+    tape.clear();
+    CHECK(tape.empty());
+    CHECK_EQUAL(0, tape.count());
+    CHECK(!tape.isMarked(-3));
+    CHECK(!tape.isMarked(5));
+}
+
+TEST(TapeUnmarkMissingCellDoesNotChangeOtherMarks){
+    Tape tape;
+    tape.mark(-4);
+    tape.unmark(9);
+    CHECK_EQUAL(1, tape.count());
+    CHECK(tape.isMarked(-4));
+}
+
+TEST(TapeInputReplacesPreviousContents){
+    Tape tape;
+    tape.mark(100);
+    std::istringstream input("-2 V..VV");
+    input >> tape;
+    CHECK(!input.fail());
+    CHECK_EQUAL(3, tape.count());
+    CHECK(tape.isMarked(-2));
+    CHECK(tape.isMarked(1));
+    CHECK(tape.isMarked(2));
+    CHECK(!tape.isMarked(-1));
+    CHECK(!tape.isMarked(0));
+    CHECK(!tape.isMarked(100));
+}
+
+TEST(TapeAllDotsProducesEmptyTape){
+    Tape tape;
+    tape.mark(4);
+    std::istringstream input("-3 ....");
+    input >> tape;
+    CHECK(!input.fail());
+    CHECK(tape.empty());
+}
+
+TEST(TapeRejectsInvalidPositionAndMissingContents){
+    const char* inputs[] = {"invalid V", "", "3"};
+    for (const char* text : inputs){
+        Tape tape;
+        tape.mark(8);
+        std::istringstream input(text);
+        input >> tape;
+        CHECK(input.fail());
+        CHECK_EQUAL(1, tape.count());
+        CHECK(tape.isMarked(8));
+    }
+}
+
+TEST(TapeRejectsUnknownCellSymbol){
+    Tape tape;
+    std::istringstream input("0 V?V");
+    input >> tape;
+    CHECK(input.fail());
+    // При ошибке символа интерфейс Tape не обещает сохранение старой ленты.
+}
+
+TEST(TapeOutputShowsEmptyAndSparseTape){
+    Tape tape;
+    std::ostringstream emptyOutput;
+    emptyOutput << tape;
+    CHECK_EQUAL(std::string("(empty tape)"), emptyOutput.str());
+    tape.mark(-1);
+    tape.mark(1);
+    std::ostringstream markedOutput;
+    markedOutput << tape;
+    CHECK_EQUAL(std::string("[-1] V . V "), markedOutput.str());
+}
+
+TEST(TapeCopyAndAssignmentAreIndependent){
+    Tape original;
+    original.mark(-1);
+    Tape copied(original);
+    Tape assigned;
+    assigned = original;
+    copied.mark(2);
+    assigned.unmark(-1);
+    CHECK_EQUAL(1, original.count());
+    CHECK(original.isMarked(-1));
+    CHECK(!original.isMarked(2));
+    CHECK_EQUAL(2, copied.count());
+    CHECK(assigned.empty());
+}
+
+TEST(AllInstructionTypesRoundTrip){
+    const Instruction instructions[] = {
+        Instruction(OpType::Mark, 2), Instruction(OpType::Erase, 3),
+        Instruction(OpType::Right, 4), Instruction(OpType::Left, 5),
+        Instruction(OpType::Branch, 6, 7), Instruction()
+    };
+    const char* expected[] = {"V 2", "X 3", "-> 4", "<- 5", "? 6, 7", "!"};
+    for (int index = 0; index < 6; ++index){
+        std::ostringstream output;
+        output << instructions[index];
+        CHECK_EQUAL(std::string(expected[index]), output.str());
+        Instruction restored(OpType::Mark, 99);
+        std::istringstream input(output.str());
+        input >> restored;
+        CHECK(!input.fail());
+        CHECK(restored == instructions[index]);
+        CHECK(!(restored != instructions[index]));
+    }
+}
+
+TEST(InstructionEqualityComparesTypeAndBothTargets){
+    const Instruction branch(OpType::Branch, 2, 3);
+    CHECK(branch != Instruction(OpType::Branch, 4, 3));
+    CHECK(branch != Instruction(OpType::Branch, 2, 4));
+    CHECK(Instruction(OpType::Left, 2) != Instruction(OpType::Right, 2));
+    CHECK_EQUAL(0, Instruction(OpType::Mark, 2).next2());
+}
+
+TEST(UnknownInstructionLeavesExistingInstructionUnchanged){
+    const Instruction expected(OpType::Branch, 2, 3);
+    Instruction instruction = expected;
+    std::istringstream input("unknown 4");
+    input >> instruction;
+    CHECK(input.fail());
+    CHECK(instruction == expected);
+}
+
+TEST(ProgramDefaultClearAndEmptyOutput){
+    Program program;
+    CHECK(program.empty());
+    CHECK_EQUAL(0, program.size());
+    CHECK(!program.has(-1));
+    CHECK(!program.has(1));
+    program.add(Instruction());
+    program.clear();
+    CHECK(program.empty());
+    std::ostringstream output;
+    output << program;
+    CHECK(output.str().empty());
+}
+
+TEST(ProgramAtRejectsOutOfRangeNumbers){
+    Program program;
+    CHECK_THROW(program.at(1), std::out_of_range);
+    program.add(Instruction());
+    CHECK_THROW(program.at(0), std::out_of_range);
+    CHECK_THROW(program.at(-1), std::out_of_range);
+    CHECK_THROW(program.at(2), std::out_of_range);
+}
+
+TEST(ProgramRemovalShiftsCommandsWithoutRewritingTargets){
+    Program program = MachineProgram("V 3\n-> 3\n!\n");
+    CHECK(!program.remove(0));
+    CHECK(!program.remove(-1));
+    CHECK_EQUAL(3, program.size());
+    CHECK(program.remove(2));
+    CHECK_EQUAL(2, program.size());
+    CHECK_EQUAL(3, program.at(1).next1());
+    CHECK(program.at(2).type() == OpType::Stop);
+    CHECK(program.remove(2));
+    CHECK(program.remove(1));
+    CHECK(program.empty());
+    CHECK(!program.remove(1));
+}
+
+TEST(ProgramRoundTripPreservesCommandOrder){
+    const Program original = MachineProgram("V 2\nX 3\n-> 4\n<- 5\n? 1, 6\n!\n");
+    std::ostringstream output;
+    output << original;
+    CHECK_EQUAL(std::string("V 2\nX 3\n-> 4\n<- 5\n? 1, 6\n!\n"), output.str());
+    Program restored;
+    std::istringstream input(output.str());
+    input >> restored;
+    CHECK(!input.fail());
+    CHECK(restored == original);
+    CHECK(!(restored != original));
+}
+
+TEST(ProgramReadReplacesPreviousCommands){
+    Program program = MachineProgram("V 2\n!\n");
+    std::istringstream input("<- 2\n!\n");
+    input >> program;
+    CHECK(!input.fail());
+    CHECK_EQUAL(2, program.size());
+    CHECK(program.at(1) == Instruction(OpType::Left, 2));
+}
+
+TEST(ProgramInvalidCommandKeepsOnlySuccessfullyReadPrefix){
+    Program program = MachineProgram("!\n");
+    std::istringstream input("V 2\nunknown\n!\n");
+    input >> program;
+    CHECK(input.fail());
+    CHECK_EQUAL(1, program.size());
+    CHECK(program.at(1) == Instruction(OpType::Mark, 2));
+}
+
+TEST(ProgramCopiesDoNotShareCommandStorage){
+    const Program original = MachineProgram("V 2\n!\n");
+    Program copied(original);
+    Program assigned;
+    assigned = original;
+    copied.remove(1);
+    assigned.clear();
+    CHECK_EQUAL(2, original.size());
+    CHECK_EQUAL(1, copied.size());
+    CHECK(assigned.empty());
+    CHECK(copied != original);
+}
+
+TEST(MachineConstructorCopiesInputTapeAndProgram){
+    Tape tape;
+    tape.mark(-3);
+    Program program = MachineProgram("!\n");
+    PostMachine machine(tape, program, -3);
+    tape.clear();
+    program.clear();
+    CHECK(machine.tape().isMarked(-3));
+    CHECK_EQUAL(1, machine.program().size());
+    CHECK_EQUAL(-3, machine.position());
+    CHECK_EQUAL(1, machine.current());
+    CHECK(machine.state() == State::Running);
+}
+
+TEST(MachineResetPreservesTapeAndCarriage){
+    PostMachine machine;
+    machine.setPosition(-2);
+    machine.setProgram(MachineProgram("V 2\n!\n"));
+    CHECK_EQUAL(2, machine.run(10));
+    machine.reset();
+    CHECK(machine.state() == State::Running);
+    CHECK_EQUAL(1, machine.current());
+    CHECK_EQUAL(-2, machine.position());
+    CHECK(machine.tape().isMarked(-2));
+}
+
+TEST(MachineRunLimitAllowsResumingExecution){
+    PostMachine machine;
+    machine.setProgram(MachineProgram("-> 1\n"));
+    CHECK_EQUAL(0, machine.run(0));
+    CHECK_EQUAL(0, machine.run(-1));
+    CHECK_EQUAL(0, machine.position());
+    CHECK_EQUAL(3, machine.run(3));
+    CHECK_EQUAL(3, machine.position());
+    CHECK(machine.state() == State::Running);
+    CHECK_EQUAL(2, machine.run(2));
+    CHECK_EQUAL(5, machine.position());
+}
+
+TEST(MachineFailedInstructionIsNotCountedAsExecuted){
+    PostMachine machine;
+    machine.setProgram(MachineProgram("X 1\n"));
+    CHECK_EQUAL(0, machine.run(10));
+    CHECK(machine.state() == State::Error);
+    const PostMachine failed = machine;
+    CHECK(!machine.step());
+    CHECK_EQUAL(0, machine.run(10));
+    CHECK(machine == failed);
+}
+
+TEST(MachineEmptyProgramFailsWithoutMovingCarriage){
+    PostMachine machine;
+    CHECK(!machine.step());
+    CHECK(machine.state() == State::Error);
+    CHECK_EQUAL(0, machine.position());
+    CHECK_EQUAL(1, machine.current());
+    CHECK(machine.tape().empty());
+}
+
+TEST(MachineCanRestartAfterReplacingFailedProgram){
+    PostMachine machine;
+    CHECK(!machine.step());
+    machine.setProgram(MachineProgram("!\n"));
+    CHECK(machine.state() == State::Error);
+    CHECK(!machine.step());
+    machine.reset();
+    CHECK(machine.step());
+    CHECK(machine.state() == State::Stopped);
+}
+
+TEST(MachinePrefixReturnsReferenceAndPostfixReturnsIndependentSnapshot){
+    PostMachine machine;
+    machine.setProgram(MachineProgram("V 2\n-> 3\n!\n"));
+    const PostMachine before = machine;
+    const PostMachine snapshot = machine++;
+    CHECK(snapshot == before);
+    CHECK(snapshot.tape().empty());
+    CHECK(machine.tape().isMarked(0));
+    PostMachine& reference = ++machine;
+    CHECK(&reference == &machine);
+    CHECK_EQUAL(1, machine.position());
+    CHECK_EQUAL(0, snapshot.position());
+    CHECK_EQUAL(3, machine.current());
+}
+
+TEST(MachineEqualityDistinguishesEachStateComponent){
+    const Program program = MachineProgram("V 1\n");
+    Tape tape;
+    tape.mark(0);
+    const PostMachine original(tape, program, 0);
+    PostMachine changed = original;
+    changed.setTape(Tape());
+    CHECK(changed != original);
+    changed = original;
+    changed.setProgram(MachineProgram("!\n"));
+    CHECK(changed != original);
+    changed = original;
+    changed.setPosition(1);
+    CHECK(changed != original);
+    changed = original;
+    CHECK(!changed.step()); // Только состояние меняется: V на помеченной ячейке.
+    CHECK(changed != original);
+    PostMachine running;
+    running.setProgram(MachineProgram("? 2, 2\n!\n"));
+    changed = running;
+    CHECK(changed.step()); // Только номер текущей команды меняется.
+    CHECK(changed != running);
+    CHECK(original == original);
+}
+
+TEST(MachineReadsCompleteFileAndResetsExecutionState){
+    PostMachine machine;
+    machine.setProgram(MachineProgram("!\n"));
+    machine.step();
+    std::istringstream input("tape: -2 V.V\ncarriage: -1\nV 2\n!\n");
+    input >> machine;
+    CHECK(!input.fail());
+    CHECK(machine.state() == State::Running);
+    CHECK_EQUAL(1, machine.current());
+    CHECK_EQUAL(-1, machine.position());
+    CHECK_EQUAL(2, machine.tape().count());
+    CHECK(machine.tape().isMarked(-2));
+    CHECK(machine.tape().isMarked(0));
+    CHECK_EQUAL(2, machine.program().size());
+    CHECK_EQUAL(2, machine.run(10));
+    CHECK(machine.tape().isMarked(-1));
+    CHECK(machine.state() == State::Stopped);
+}
+
+TEST(MachineMalformedFileDoesNotChangeExistingMachine){
+    const char* inputs[] = {
+        "", "wrong: 0 V\ncarriage: 0\n!\n",
+        "tape: bad V\ncarriage: 0\n!\n",
+        "tape: 0 V?\ncarriage: 0\n!\n",
+        "tape: 0 V\nwrong: 0\n!\n",
+        "tape: 0 V\ncarriage: bad\n!\n",
+        "tape: 0 V\ncarriage: 0\nunknown\n"
+    };
+    Tape tape;
+    tape.mark(9);
+    PostMachine machine(tape, MachineProgram("-> 2\n!\n"), 9);
+    machine.step();
+    const PostMachine original = machine;
+    for (const char* text : inputs){
+        std::istringstream input(text);
+        input >> machine;
+        CHECK(input.fail());
+        CHECK(machine == original);
+    }
+}
+
+TEST(MachineOutputShowsRunningStoppedAndErrorStates){
+    PostMachine machine;
+    machine.setProgram(MachineProgram("!\n"));
+    std::ostringstream running;
+    running << machine;
+    CHECK_EQUAL(std::string("[Running]\ncommand: 1 !\ncarriage: 0\ntape: (empty tape)\n"), running.str());
+    machine.step();
+    std::ostringstream stopped;
+    stopped << machine;
+    CHECK(stopped.str().find("[Stopped]\n") == 0);
+    PostMachine failed;
+    failed.step();
+    std::ostringstream error;
+    error << failed;
+    CHECK(error.str().find("[Error]\n") == 0);
+    CHECK(error.str().find("no such command with number: 1\n") != std::string::npos);
+}
 
 int main(){
     return UnitTest::RunAllTests();

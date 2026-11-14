@@ -90,5 +90,5 @@ V 4
 | `postmachine.h/.cpp` | класс `PostMachine` и `enum class State` - машина |
 | `menu.h/.cpp` | консольное меню |
 | `main.cpp` | точка входа: меню или выполнение файла |
-| `tests.cpp` | 30 юнит-тестов на UnitTest++ |
+| `tests.cpp` | 50 юнит-тестов на UnitTest++ |
 | `example.txt` | пример программы |
