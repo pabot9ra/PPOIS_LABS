@@ -3,6 +3,7 @@
 
 #include "shipment.h"
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -10,7 +11,7 @@ class PostalBranch {
 private:
     int id_;
     PostalAddress address_;
-    std::vector<Shipment> shipments_;
+    std::vector<std::unique_ptr<Shipment>> shipments_;
 
 public:
     PostalBranch(int id, const PostalAddress &address);
@@ -20,7 +21,7 @@ public:
     std::size_t shipmentCount() const;
 
     void acceptShipment(const Shipment &shipment);
-    Shipment findShipment(const std::string &trackingNumber) const;
+    const Shipment &findShipment(const std::string &trackingNumber) const;
 };
 
 #endif

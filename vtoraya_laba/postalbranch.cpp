@@ -24,18 +24,18 @@ void PostalBranch::acceptShipment(const Shipment &shipment) {
     if(shipment.status() != ShipmentStatus::Accepted){
         throw std::logic_error("Only a newly accepted shipment can be registered");
     }
-    for(const Shipment &stored : shipments_){
-        if(stored.trackingNumber() == shipment.trackingNumber()){
+    for(const auto &stored : shipments_){
+        if(stored->trackingNumber() == shipment.trackingNumber()){
             throw std::invalid_argument("Tracking number is already registered at this branch");
         }
     }
-    shipments_.push_back(shipment);
+    shipments_.push_back(shipment.clone());
 }
 
-Shipment PostalBranch::findShipment(const std::string &trackingNumber) const {
-    for(const Shipment &shipment : shipments_){
-        if(shipment.trackingNumber() == trackingNumber){
-            return shipment;
+const Shipment &PostalBranch::findShipment(const std::string &trackingNumber) const {
+    for(const auto &shipment : shipments_){
+        if(shipment->trackingNumber() == trackingNumber){
+            return *shipment;
         }
     }
     throw std::out_of_range("Shipment was not found at this branch");

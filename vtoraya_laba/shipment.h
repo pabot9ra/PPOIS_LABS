@@ -2,6 +2,7 @@
 #define SHIPMENT_H
 
 #include "customer.h"
+#include <memory>
 #include <string>
 
 enum class ShipmentStatus {
@@ -20,6 +21,10 @@ private:
 public:
     Shipment(const std::string &trackingNumber, const Customer &sender,
              const Customer &recipient);
+    virtual ~Shipment() = default;
+
+    virtual int calculatePrice() const = 0;
+    virtual std::unique_ptr<Shipment> clone() const = 0;
 
     const std::string &trackingNumber() const;
     const Customer &sender() const;
