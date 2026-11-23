@@ -21,6 +21,7 @@ public:
     int id() const;
     const PostalAddress &address() const;
     std::size_t shipmentCount() const;
+    bool containsShipment(const std::string &trackingNumber) const;
 
     void acceptShipment(const Shipment &shipment);
     const Shipment &findShipment(const std::string &trackingNumber) const;

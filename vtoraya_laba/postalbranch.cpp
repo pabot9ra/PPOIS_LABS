@@ -23,6 +23,15 @@ std::size_t PostalBranch::shipmentCount() const {
     return shipments_.size();
 }
 
+bool PostalBranch::containsShipment(const std::string &trackingNumber) const {
+    for(const auto &shipment : shipments_){
+        if(shipment->trackingNumber() == trackingNumber){
+            return true;
+        }
+    }
+    return false;
+}
+
 void PostalBranch::acceptShipment(const Shipment &shipment) {
     if(shipment.status() != ShipmentStatus::Accepted){
         throw std::logic_error("Only a newly accepted shipment can be registered");
