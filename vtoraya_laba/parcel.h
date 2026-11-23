@@ -14,7 +14,7 @@ public:
            const Customer &recipient, int weightGrams, int basePrice,
            int pricePerKilogram);
 
-    int weightGrams() const;
+    int weightGrams() const override;
     int basePrice() const;
     int pricePerKilogram() const;
     int chargedKilograms() const;

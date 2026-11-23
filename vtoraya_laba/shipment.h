@@ -24,6 +24,7 @@ public:
     virtual ~Shipment() = default;
 
     virtual int calculatePrice() const = 0;
+    virtual int weightGrams() const = 0;
     virtual std::unique_ptr<Shipment> clone() const = 0;
 
     const std::string &trackingNumber() const;

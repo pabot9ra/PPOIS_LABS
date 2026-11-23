@@ -12,7 +12,7 @@ public:
     Letter(const std::string &trackingNumber, const Customer &sender,
            const Customer &recipient, int weightGrams, int pricePerGram);
 
-    int weightGrams() const;
+    int weightGrams() const override;
     int pricePerGram() const;
     int calculatePrice() const override;
     std::unique_ptr<Shipment> clone() const override;
