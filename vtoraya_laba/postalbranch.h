@@ -26,6 +26,8 @@ public:
     const Shipment &findShipment(const std::string &trackingNumber) const;
     void dispatchShipment(const std::string &trackingNumber);
     void deliverShipment(const std::string &trackingNumber);
+    void confirmReceipt(const std::string &trackingNumber, const std::string &signer);
+    void recordCompensation(const std::string &trackingNumber, int amount);
 };
 
 #endif

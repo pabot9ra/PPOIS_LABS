@@ -1,5 +1,7 @@
 #include "postalbranch.h"
 #include "shipmentnotfoundexception.h"
+#include "registeredletter.h"
+#include "insuredparcel.h"
 #include <stdexcept>
 
 PostalBranch::PostalBranch(int id, const PostalAddress &address)
@@ -59,4 +61,22 @@ void PostalBranch::dispatchShipment(const std::string &trackingNumber) {
 void PostalBranch::deliverShipment(const std::string &trackingNumber) {
     Shipment &shipment = findMutableShipment(trackingNumber);
     shipment.deliver();
+}
+
+void PostalBranch::confirmReceipt(const std::string &trackingNumber, const std::string &signer) {
+    Shipment &shipment = findMutableShipment(trackingNumber);
+    auto *letter = dynamic_cast<RegisteredLetter *>(&shipment);
+    if(!letter){
+        throw std::invalid_argument("Receipt confirmation requires a registered letter");
+    }
+    letter->confirmReceipt(signer);
+}
+
+void PostalBranch::recordCompensation(const std::string &trackingNumber, int amount) {
+    Shipment &shipment = findMutableShipment(trackingNumber);
+    auto *parcel = dynamic_cast<InsuredParcel *>(&shipment);
+    if(!parcel){
+        throw std::invalid_argument("Compensation requires an insured parcel");
+    }
+    parcel->recordCompensation(amount);
 }
