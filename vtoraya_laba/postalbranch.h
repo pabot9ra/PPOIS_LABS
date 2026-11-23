@@ -13,6 +13,8 @@ private:
     PostalAddress address_;
     std::vector<std::unique_ptr<Shipment>> shipments_;
 
+    Shipment &findMutableShipment(const std::string &trackingNumber);
+
 public:
     PostalBranch(int id, const PostalAddress &address);
 
@@ -22,6 +24,8 @@ public:
 
     void acceptShipment(const Shipment &shipment);
     const Shipment &findShipment(const std::string &trackingNumber) const;
+    void dispatchShipment(const std::string &trackingNumber);
+    void deliverShipment(const std::string &trackingNumber);
 };
 
 #endif

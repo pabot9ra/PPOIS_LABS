@@ -40,3 +40,22 @@ const Shipment &PostalBranch::findShipment(const std::string &trackingNumber) co
     }
     throw std::out_of_range("Shipment was not found at this branch");
 }
+
+Shipment &PostalBranch::findMutableShipment(const std::string &trackingNumber) {
+    for(const auto &shipment : shipments_){
+        if(shipment->trackingNumber() == trackingNumber){
+            return *shipment;
+        }
+    }
+    throw std::out_of_range("Shipment was not found at this branch");
+}
+
+void PostalBranch::dispatchShipment(const std::string &trackingNumber) {
+    Shipment &shipment = findMutableShipment(trackingNumber);
+    shipment.dispatch();
+}
+
+void PostalBranch::deliverShipment(const std::string &trackingNumber) {
+    Shipment &shipment = findMutableShipment(trackingNumber);
+    shipment.deliver();
+}
