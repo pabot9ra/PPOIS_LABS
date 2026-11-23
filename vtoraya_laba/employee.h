@@ -17,6 +17,7 @@ protected:
 public:
     Employee(int id, const std::string &name, int branchId);
     virtual ~Employee() = default;
+    Employee &operator=(const Employee &other) = delete;
 
     int id() const;
     const std::string &name() const;
@@ -24,9 +25,9 @@ public:
     bool onShift() const;
     virtual std::string role() const = 0;
 
-    void startShift();
-    void endShift();
-    void assignToBranch(int branchId);
+    virtual void startShift();
+    virtual void endShift();
+    virtual void assignToBranch(int branchId);
 };
 
 #endif

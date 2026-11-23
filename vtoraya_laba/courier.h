@@ -4,7 +4,7 @@
 #include "employee.h"
 #include <cstddef>
 
-class Courier : public Employee {
+class Courier : virtual public Employee {
 private:
     std::size_t dispatchedCount_;
     std::size_t deliveredCount_;

@@ -4,7 +4,7 @@
 #include "employee.h"
 #include <cstddef>
 
-class PostalClerk : public Employee {
+class PostalClerk : virtual public Employee {
 private:
     std::size_t acceptedCount_;
 
