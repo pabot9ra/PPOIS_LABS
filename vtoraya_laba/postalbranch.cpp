@@ -1,4 +1,5 @@
 #include "postalbranch.h"
+#include "shipmentnotfoundexception.h"
 #include <stdexcept>
 
 PostalBranch::PostalBranch(int id, const PostalAddress &address)
@@ -38,7 +39,7 @@ const Shipment &PostalBranch::findShipment(const std::string &trackingNumber) co
             return *shipment;
         }
     }
-    throw std::out_of_range("Shipment was not found at this branch");
+    throw ShipmentNotFoundException(trackingNumber);
 }
 
 Shipment &PostalBranch::findMutableShipment(const std::string &trackingNumber) {
@@ -47,7 +48,7 @@ Shipment &PostalBranch::findMutableShipment(const std::string &trackingNumber) {
             return *shipment;
         }
     }
-    throw std::out_of_range("Shipment was not found at this branch");
+    throw ShipmentNotFoundException(trackingNumber);
 }
 
 void PostalBranch::dispatchShipment(const std::string &trackingNumber) {
