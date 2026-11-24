@@ -2,6 +2,8 @@
 #include "shipmentnotfoundexception.h"
 #include "registeredletter.h"
 #include "insuredparcel.h"
+#include "duplicateshipmentexception.h"
+#include "shipmentstateexception.h"
 #include <stdexcept>
 
 PostalBranch::PostalBranch(int id, const PostalAddress &address)
@@ -34,11 +36,11 @@ bool PostalBranch::containsShipment(const std::string &trackingNumber) const {
 
 void PostalBranch::acceptShipment(const Shipment &shipment) {
     if(shipment.status() != ShipmentStatus::Accepted){
-        throw std::logic_error("Only a newly accepted shipment can be registered");
+        throw ShipmentStateException(shipment.trackingNumber(), shipment.status(), "register");
     }
     for(const auto &stored : shipments_){
         if(stored->trackingNumber() == shipment.trackingNumber()){
-            throw std::invalid_argument("Tracking number is already registered at this branch");
+            throw DuplicateShipmentException(shipment.trackingNumber());
         }
     }
     shipments_.push_back(shipment.clone());

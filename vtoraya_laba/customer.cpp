@@ -1,11 +1,12 @@
 #include "customer.h"
+#include "invalidcustomerexception.h"
 #include <cctype>
 #include <stdexcept>
 
 Customer::Customer(int id, const std::string &name, const PostalAddress &address)
     : id_(id), name_(name), address_(address) {
     if(id_ <= 0){
-        throw std::invalid_argument("Customer ID must be positive");
+        throw InvalidCustomerException(id_, "Customer ID must be positive");
     }
     bool hasName = false;
     for(char character : name_){
@@ -15,7 +16,7 @@ Customer::Customer(int id, const std::string &name, const PostalAddress &address
         }
     }
     if(!hasName){
-        throw std::invalid_argument("Customer name must not be blank");
+        throw InvalidCustomerException(id_, "Customer name must not be blank");
     }
 }
 

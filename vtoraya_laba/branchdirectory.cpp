@@ -1,4 +1,6 @@
 #include "branchdirectory.h"
+#include "branchnotfoundexception.h"
+#include "duplicateshipmentexception.h"
 #include <stdexcept>
 #include <utility>
 
@@ -21,7 +23,7 @@ void BranchDirectory::add(int id, const PostalAddress &address) {
 const PostalBranch &BranchDirectory::find(int id) const {
     auto it = branches_.find(id);
     if(it == branches_.end()){
-        throw std::out_of_range("Postal branch was not found");
+        throw BranchNotFoundException(id);
     }
     return *it->second;
 }
@@ -29,7 +31,7 @@ const PostalBranch &BranchDirectory::find(int id) const {
 PostalBranch &BranchDirectory::findMutable(int id) {
     auto it = branches_.find(id);
     if(it == branches_.end()){
-        throw std::out_of_range("Postal branch was not found");
+        throw BranchNotFoundException(id);
     }
     return *it->second;
 }
@@ -71,7 +73,7 @@ int BranchDirectory::locateShipment(const std::string &trackingNumber) const {
 void BranchDirectory::acceptShipment(int branchId, const Shipment &shipment) {
     PostalBranch &branch = findMutable(branchId);
     if(containsShipment(shipment.trackingNumber())){
-        throw std::invalid_argument("Tracking number is already registered in another branch or this branch");
+        throw DuplicateShipmentException(shipment.trackingNumber());
     }
     branch.acceptShipment(shipment);
 }

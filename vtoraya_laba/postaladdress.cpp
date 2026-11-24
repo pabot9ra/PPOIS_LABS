@@ -1,4 +1,5 @@
 #include "postaladdress.h"
+#include "invalidaddressexception.h"
 
 #include <cctype>
 #include <cstddef>
@@ -34,10 +35,10 @@ PostalAddress::PostalAddress(const std::string &city, const std::string &street,
     : city_(city), street_(street), house_(house), postalCode_(postalCode) {
     if (!hasVisibleCharacters(city_) || !hasVisibleCharacters(street_) ||
         !hasVisibleCharacters(house_)) {
-        throw std::invalid_argument("City, street and house must not be blank");
+        throw InvalidAddressException("city/street/house", "Required fields must not be blank");
     }
     if (!isValidPostalCode(postalCode_)) {
-        throw std::invalid_argument("Postal code must contain exactly six digits");
+        throw InvalidAddressException("postalCode", "Postal code must contain exactly six digits");
     }
 }
 

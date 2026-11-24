@@ -1,4 +1,5 @@
 #include "vehicle.h"
+#include "capacityexceededexception.h"
 #include <cctype>
 #include <stdexcept>
 
@@ -60,7 +61,7 @@ void Vehicle::ensureCanLoad(const MailBag &bag) const {
         throw std::invalid_argument("Bag source or destination does not match the remaining route");
     }
     if(bag.weightGrams() > remainingCapacity()){
-        throw std::invalid_argument("Bag exceeds remaining vehicle capacity");
+        throw CapacityExceededException("Vehicle " + plate_, bag.weightGrams(), remainingCapacity());
     }
 }
 

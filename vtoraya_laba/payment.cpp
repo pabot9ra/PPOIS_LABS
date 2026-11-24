@@ -1,4 +1,5 @@
 #include "payment.h"
+#include "refundlimitexception.h"
 #include <cctype>
 #include <stdexcept>
 
@@ -50,7 +51,7 @@ void Payment::refund(int amount) {
         throw std::logic_error("Only a captured payment can be refunded");
     }
     if(amount <= 0 || amount > refundableAmount()){
-        throw std::invalid_argument("Refund must be positive and within the remaining payment amount");
+        throw RefundLimitException(amount, refundableAmount());
     }
     refundedAmount_ += amount;
 }

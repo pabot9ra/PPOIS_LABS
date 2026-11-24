@@ -1,4 +1,5 @@
 #include "mailbag.h"
+#include "capacityexceededexception.h"
 #include <cctype>
 #include <stdexcept>
 
@@ -69,7 +70,7 @@ void MailBag::addShipment(const Shipment &shipment) {
         throw std::invalid_argument("Shipment is already in this bag");
     }
     if(shipment.weightGrams() > remainingCapacity()){
-        throw std::invalid_argument("Shipment exceeds remaining bag capacity");
+        throw CapacityExceededException("Mail bag " + id_, shipment.weightGrams(), remainingCapacity());
     }
     trackingNumbers_.push_back(shipment.trackingNumber());
     weightGrams_ += shipment.weightGrams();

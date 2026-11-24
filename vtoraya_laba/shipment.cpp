@@ -1,4 +1,5 @@
 #include "shipment.h"
+#include "shipmentstateexception.h"
 #include <cctype>
 #include <stdexcept>
 
@@ -34,14 +35,14 @@ ShipmentStatus Shipment::status() const {
 
 void Shipment::dispatch() {
     if(status_ != ShipmentStatus::Accepted){
-        throw std::logic_error("Only an accepted shipment can be dispatched");
+        throw ShipmentStateException(trackingNumber_, status_, "dispatch");
     }
     status_ = ShipmentStatus::InTransit;
 }
 
 void Shipment::deliver() {
     if(status_ != ShipmentStatus::InTransit){
-        throw std::logic_error("Only a shipment in transit can be delivered");
+        throw ShipmentStateException(trackingNumber_, status_, "deliver");
     }
     status_ = ShipmentStatus::Delivered;
 }

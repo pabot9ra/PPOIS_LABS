@@ -1,4 +1,6 @@
 #include "cashregister.h"
+#include "paymentnotfoundexception.h"
+#include "refundlimitexception.h"
 #include <limits>
 #include <stdexcept>
 
@@ -73,7 +75,7 @@ const Payment &CashRegister::findPayment(int paymentId) const {
             return payment;
         }
     }
-    throw std::out_of_range("Payment was not found");
+    throw PaymentNotFoundException(paymentId);
 }
 
 Payment &CashRegister::findMutablePayment(int paymentId) {
@@ -82,7 +84,7 @@ Payment &CashRegister::findMutablePayment(int paymentId) {
             return payment;
         }
     }
-    throw std::out_of_range("Payment was not found");
+    throw PaymentNotFoundException(paymentId);
 }
 
 void CashRegister::processRefund(const Refund &refund) {
@@ -93,8 +95,12 @@ void CashRegister::processRefund(const Refund &refund) {
         }
     }
     Payment &payment = findMutablePayment(refund.paymentId());
-    if(refund.amount() > payment.refundableAmount() || refund.amount() > balance_){
-        throw std::invalid_argument("Refund exceeds the payment remainder or register balance");
+    int available = payment.refundableAmount();
+    if(balance_ < available){
+        available = balance_;
+    }
+    if(refund.amount() > available){
+        throw RefundLimitException(refund.amount(), available);
     }
     processedRefunds_.push_back(refund);
     payment.refund(refund.amount());

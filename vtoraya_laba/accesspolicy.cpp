@@ -1,4 +1,5 @@
 #include "accesspolicy.h"
+#include "accessdeniedexception.h"
 #include <cctype>
 #include <stdexcept>
 
@@ -40,7 +41,7 @@ void AccessPolicy::revokePermission(const std::string &permission) {
 void AccessPolicy::checkPermission(const std::string &permission) {
     if(!enabled_ || !hasPermission(permission)){
         deniedCount_++;
-        throw std::logic_error("Operation is not allowed by the access policy");
+        throw AccessDeniedException(permission);
     }
 }
 

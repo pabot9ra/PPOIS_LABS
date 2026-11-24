@@ -1,4 +1,5 @@
 #include "customerdirectory.h"
+#include "customernotfoundexception.h"
 #include <stdexcept>
 
 std::size_t CustomerDirectory::size() const {
@@ -19,7 +20,7 @@ void CustomerDirectory::add(const Customer &customer) {
 const Customer &CustomerDirectory::find(int id) const {
     auto it = customers_.find(id);
     if(it == customers_.end()){
-        throw std::out_of_range("Customer was not found");
+        throw CustomerNotFoundException(id);
     }
     return it->second;
 }
@@ -27,13 +28,13 @@ const Customer &CustomerDirectory::find(int id) const {
 void CustomerDirectory::changeAddress(int id, const PostalAddress &address) {
     auto it = customers_.find(id);
     if(it == customers_.end()){
-        throw std::out_of_range("Customer was not found");
+        throw CustomerNotFoundException(id);
     }
     it->second.changeAddress(address);
 }
 
 void CustomerDirectory::remove(int id) {
     if(customers_.erase(id) == 0){
-        throw std::out_of_range("Customer was not found");
+        throw CustomerNotFoundException(id);
     }
 }
