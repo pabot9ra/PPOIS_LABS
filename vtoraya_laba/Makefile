@@ -1,5 +1,6 @@
 CMAKE ?= cmake
 PYTHON ?= python3
+DOXYGEN ?= doxygen
 BUILD_DIR ?= build
 JOBS ?= 4
 
@@ -21,7 +22,10 @@ coverage:
 	$(CMAKE) --build build-coverage --parallel $(JOBS)
 	$(PYTHON) scripts/coverage.py build-coverage
 
-clean:
-	$(CMAKE) -E rm -rf build build-coverage
+docs:
+	$(DOXYGEN) Doxyfile
 
-.PHONY: all test run demo coverage clean
+clean:
+	$(CMAKE) -E rm -rf build build-coverage build-docs html
+
+.PHONY: all test run demo coverage docs clean

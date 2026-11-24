@@ -1,9 +1,16 @@
+/// @file main.cpp
+/// @brief Запуск меню или демонстраций по параметрам командной строки.
+
 #include "menu.h"
 #include "demos.h"
 #include <exception>
 #include <iostream>
 #include <string>
 
+/// @brief Запускает меню, примеры (--demo) или справку (--help).
+/// @param argc Количество аргументов вместе с именем программы.
+/// @param argv Аргументы командной строки.
+/// @return 0 при успехе, 1 при исключении, 2 при неизвестных параметрах.
 int main(int argc, char *argv[]) {
     try {
         if(argc == 1){
